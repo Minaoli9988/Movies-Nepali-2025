@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Uploading & Blogging Website with PayPal Withdrawal</title>
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+    .movie-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+    .movie-card {
+      background-color: white;
+      width: 250px;
+      margin: 10px;
+      padding: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .movie-card h3 {
+      margin-bottom: 10px;
+    }
+    .movie-card p {
+      font-size: 14px;
+      color: #555;
+    }
+    .movie-card video {
+      width: 100%;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .movie-form {
+      background-color: white;
+      margin-top: 30px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .movie-form input, .movie-form textarea, .movie-form input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .movie-form button {
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .movie-form button:hover {
+      background-color: #555;
+    }
+    .comments-section {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .comment {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #333;
+    }
+    .withdraw-section {
+      background-color: white;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .withdraw-section input, .withdraw-section button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      max-width: 250px;
+      font-size: 16px;
+    }
+    .withdraw-section button {
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Movie Uploading & Blogging Website with PayPal Withdrawal</h1>
+  </header>
+
+  <!-- Movie Cards -->
+  <div class="movie-container" id="movieContainer">
+    <!-- Movie items will be populated here -->
+  </div>
+
+  <!-- Movie Upload Form -->
+  <div class="movie-form">
+    <h2>Add a Movie</h2>
+    <input type="text" id="movieTitle" placeholder="Movie Title" required>
+    <textarea id="movieDescription" placeholder="Movie Description" required></textarea>
+    <input type="file" id="movieFile" accept="video/*" required>
+    <button onclick="addMovie()">Add Movie</button>
+  </div>
+
+  <!-- Movie Comments -->
+  <div class="comments-section" id="commentsSection">
+    <h2>Comments</h2>
+    <textarea id="commentText" placeholder="Write your comment here..." required></textarea>
+    <button onclick="addComment()">Post Comment</button>
+    <div id="commentList"></div>
+  </div>
+
+  <!-- Withdraw Section (Admin View) -->
+  <div class="withdraw-section" id="withdrawSection">
+    <h2>Withdraw Earnings</h2>
+    <input type="number" id="withdrawAmount" placeholder="Amount to withdraw" min="1">
+    <div id="paypal-button-container"></div>
+  </div>
+
+  <script>
+    let movies = [];
+    let userEarnings = 0;
+
+    // Add movie function
+    function addMovie() {
+      const title = document.getElementById('movieTitle').value;
+      const description = document.getElementById('movieDescription').value;
+      const fileInput = document.getElementById('movieFile');
+      const file = fileInput.files[0];
+
+      if (title && description && file) {
+        const movie = {
+          title: title,
+          description: description,
+          file: URL.createObjectURL(file)
+        };
+
+        movies.push(movie);
+        displayMovies();
+        userEarnings += 5; // Earn $5 for uploading a movie
+        updateEarnings();
+
+        clearForm();
+      } else {
+        alert('Please fill in all fields');
+      }
+    }
+
+    function displayMovies() {
+      const container = document.getElementById('movieContainer');
+      container.innerHTML = '';
+      movies.forEach((movie) => {
+        const movieCard = `
+          <div class="movie-card">
+            <video controls>
+              <source src="${movie.file}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <h3>${movie.title}</h3>
+            <p>${movie.description}</p>
+          </div>
+        `;
+        container.innerHTML += movieCard;
+      });
+    }
+
+    function clearForm() {
+      document.getElementById('movieTitle').value = '';
+      document.getElementById('movieDescription').value = '';
+      document.getElementById('movieFile').value = '';
+    }
+
+    // Add comment function
+    function addComment() {
+      const commentText = document.getElementById('commentText').value;
+
+      if (commentText) {
+        const comment = `
+          <div class="comment">
+            <p>${commentText}</p>
+          </div>
+        `;
+        document.getElementById('commentList').innerHTML += comment;
+        userEarnings += 1; // Earn $1 for posting a comment
+        updateEarnings();
+
+        document.getElementById('commentText').value = '';
+      } else {
+        alert('Please write a comment before posting');
+      }
+    }
+
+    // Update the displayed earnings for the user
+    function updateEarnings() {
+      console.log('User Earnings: $' + userEarnings); // Log for debugging, not shown to the user
+    }
+
+    // PayPal Button Integration
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: userEarnings.toFixed(2)  // Use the current earnings as the transaction value
+            }
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert('Payment successful! Thank you for your transaction.');
+          // Reset earnings after withdrawal
+          userEarnings = 0;
+          updateEarnings();
+        });
+      },
+      onCancel: function(data) {
+        alert('Payment was canceled.');
+      },
+      onError: function(err) {
+        console.error('Error in PayPal transaction:', err);
+        alert('An error occurred with the payment. Please try again.');
+      }
+    }).render('#paypal-button-container'); // Render PayPal button
+  </script>
+
+</body>
+</html>
