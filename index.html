@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandip Oil - Hindi New Movie Upload</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(
+                    rgba(0, 0, 0, 0.5),
+                    rgba(0, 0, 0, 0.7)
+                ),
+                url('https://upload.wikimedia.org/wikipedia/commons/9/9b/Flag_of_Nepal.svg') no-repeat center center,
+                url('https://upload.wikimedia.org/wikipedia/commons/e/e2/Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg') no-repeat bottom center;
+            background-size: contain, 30%, cover;
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+        }
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.5rem;
+        }
+        .btn-warning {
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        .card img {
+            height: 200px;
+            object-fit: cover;
+        }
+        footer {
+            background-color: rgba(15, 52, 96, 0.9);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        footer a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Sandip Oil</h1>
+        <p>Hindi New Movie Upload</p>
+        <a href="#movies" class="btn btn-warning btn-lg mt-3">View Latest Movies</a>
+    </div>
+
+    <!-- Movie Upload Section -->
+    <section id="upload-movie" class="container my-5">
+        <h2 class="text-center mb-4">Upload a Movie</h2>
+        <form id="uploadForm" class="text-center">
+            <div class="mb-3">
+                <input type="text" id="movieTitle" class="form-control" placeholder="Enter Movie Title" required>
+            </div>
+            <div class="mb-3">
+                <input type="url" id="moviePoster" class="form-control" placeholder="Enter Movie Poster URL" required>
+            </div>
+            <div class="mb-3">
+                <input type="url" id="movieLink" class="form-control" placeholder="Enter Movie Watch Link" required>
+            </div>
+            <button type="submit" class="btn btn-warning">Upload Movie</button>
+        </form>
+    </section>
+
+    <!-- Movie Search and Earnings Section -->
+    <section id="movies" class="container my-5">
+        <h2 class="text-center mb-4">Search and Watch Movies</h2>
+        <div class="search-bar text-center">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search movies..." onkeyup="searchMovies()">
+        </div>
+        <div id="movieList" class="row">
+            <!-- Movies will be dynamically displayed here -->
+        </div>
+    </section>
+
+    <!-- Earnings Section -->
+    <section id="earnings" class="container my-5">
+        <h2 class="text-center mb-4">Earnings</h2>
+        <div class="row">
+            <div class="col-md-6 offset-md-3 text-center">
+                <div class="earnings">
+                    <h3>Total Earnings</h3>
+                    <p id="totalEarnings" style="font-size: 1.5rem;">NRs 0</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Sandip Oil | <a href="#">Privacy Policy</a></p>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript for Movie Upload and Earnings -->
+    <script>
+        // Movie storage (simulated database)
+        const movies = [];
+        let totalEarnings = 0; // Total earnings tracker
+
+        // Function to display movies
+        function displayMovies(filteredMovies = movies) {
+            const movieList = document.getElementById('movieList');
+            movieList.innerHTML = ''; // Clear the list
+            filteredMovies.forEach((movie, index) => {
+                const movieCard = `
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <img src="${movie.poster}" class="card-img-top" alt="${movie.title}">
+                            <div class="card-body">
+                                <h5 class="card-title">${movie.title}</h5>
+                                <p>Earned: NRs ${movie.earnings}</p>
+                                <a href="${movie.link}" target="_blank" class="btn btn-warning" onclick="increaseEarnings(${index})">Watch Now</a>
+                            </div>
+                        </div>
+                    </div>`;
+                movieList.innerHTML += movieCard;
+            });
+        }
+
+        // Function to handle movie upload
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const title = document.getElementById('movieTitle').value;
+            const poster = document.getElementById('moviePoster').value;
+            const link = document.getElementById('movieLink').value;
+
+            // Add movie to the array with initial earnings
+            movies.push({ title, poster, link, earnings: 0 });
+
+            // Reset the form
+            this.reset();
+
+            // Display updated movie list
+            displayMovies();
+        });
+
+        // Function to handle movie search
+        function searchMovies() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filteredMovies = movies.filter(movie => movie.title.toLowerCase().includes(query));
+            displayMovies(filteredMovies);
+        }
+
+        // Function to simulate earning increase when a movie is watched
+        function increaseEarnings(index) {
+            const earningPerView = 10; // Example earning per view (NRs 10)
+            movies[index].earnings += earningPerView;
+            totalEarnings += earningPerView;
+
+            // Update the earnings display
+            document.getElementById('totalEarnings').textContent = `NRs ${totalEarnings}`;
+            displayMovies(); // Refresh movie list
+        }
+
+        // Initial display
+        displayMovies();
+    </script>
+</body>
+</html>
